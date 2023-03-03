@@ -7,7 +7,7 @@ class Game {
         // Đặt camera và renderer
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(this.renderer.domElement);
-        this.camera.position.z = 5;
+        this.camera.position.z = 10;
 
         // Tạo mặt phẳng
         const planeGeometry = new THREE.PlaneGeometry(10, 10);
@@ -22,6 +22,25 @@ class Game {
         this.cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
         this.cubeMesh.position.set(0, 0.5, 0);
         this.scene.add(this.cubeMesh);
+
+        this.cubeMesh.addEventListener('click', () => {
+            console.log('Clicked on cube');
+        });
+
+        this.cube = [];
+
+        for (let i = 0; i < 5; i++) {
+            let geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+            let material = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
+            const cube = new THREE.Mesh(geometry, material);
+            cube.position.x = (Math.random() - 0.5) * 5;
+            cube.position.y = (Math.random() - 0.5) * 5;
+            cube.position.z = (Math.random() - 0.5) * 5;
+            this.cube[i] = cube;
+            this.scene.add(cube);
+
+
+        }
 
         // Tạo bóng
         const sphereGeometry = new THREE.SphereGeometry(0.5, 32, 32);
@@ -40,23 +59,52 @@ class Game {
         // Thêm sự kiện xoay cube khi ấn phím
         document.addEventListener("keydown", (event) => {
             if (event.key === "ArrowLeft") {
-                this.cubeMesh.rotation.y -= 0.1;
+                this.cubeMesh.position.x -= 0.1;
             } else if (event.key === "ArrowRight") {
-                this.cubeMesh.rotation.y += 0.1;
+                this.cubeMesh.position.x += 0.1;
             } else if (event.key === "ArrowUp") {
-                this.cubeMesh.rotation.x += 0.1;
+                this.cubeMesh.position.y += 0.1;
             } else if (event.key === "ArrowDown") {
-                this.cubeMesh.rotation.x -= 0.1;
+                this.cubeMesh.position.y -= 0.1;
             }
         });
 
+        document.addEventListener('click', this.onClick.bind(this));
+
+    }
+
+    onClick(event) {
+        // Lấy vị trí chuột trong khoảng viewport
+        const mouse = new THREE.Vector2(
+            (event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1
+        );
+
+        // Lấy đối tượng được click
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(mouse, this.camera);
+        const intersects = raycaster.intersectObject(this.cubeMesh);
+
+        // Kiểm tra xem có va chạm với đối tượng hay không
+        if (intersects.length > 0) {
+            // Xử lý sự kiện click chuột trên đối tượng
+            console.log('Clicked on the cube!');
+        }
     }
 
     // Render scene
     render() {
+        this.cubeMesh.rotation.x += 0.01;
+        this.cubeMesh.rotation.y += 0.01;
+        for (let i = 0; i < this.cube.length; i++) {
+            this.cube[i].rotation.x += 0.01;
+            this.cube[i].rotation.y += 0.01;
+            this.cube[i].rotation.z += 0.01;
+            this.cube[i].visible = true;
+        }
         requestAnimationFrame(this.render.bind(this));
         this.sphereMesh.position.x = Math.sin(Date.now() * 0.001) * 2;
         this.sphereMesh.position.z = Math.cos(Date.now() * 0.001) * 2;
+        // this.sphereMesh.position.z = Math.cos(Date.now() * 0.001) * 2;
         this.renderer.render(this.scene, this.camera);
     }
 }
