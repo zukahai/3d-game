@@ -82,13 +82,21 @@ class Game {
         // Lấy đối tượng được click
         const raycaster = new THREE.Raycaster();
         raycaster.setFromCamera(mouse, this.camera);
-        const intersects = raycaster.intersectObject(this.cubeMesh);
 
-        // Kiểm tra xem có va chạm với đối tượng hay không
-        if (intersects.length > 0) {
-            // Xử lý sự kiện click chuột trên đối tượng
-            console.log('Clicked on the cube!');
+        for (let i = 0; i < this.cube.length; i++) {
+            if (this.checkClick(raycaster, this.cube[i])) {
+                this.cube[i].visible = false;
+            }
         }
+    }
+
+    checkClick(raycaster, object) {
+        const intersects = raycaster.intersectObject(object);
+        if (intersects.length > 0) {
+            console.log('Clicked on the cube!');
+            return true;
+        }
+        return false;
     }
 
     // Render scene
@@ -99,7 +107,6 @@ class Game {
             this.cube[i].rotation.x += 0.01;
             this.cube[i].rotation.y += 0.01;
             this.cube[i].rotation.z += 0.01;
-            this.cube[i].visible = true;
         }
         requestAnimationFrame(this.render.bind(this));
         this.sphereMesh.position.x = Math.sin(Date.now() * 0.001) * 2;
