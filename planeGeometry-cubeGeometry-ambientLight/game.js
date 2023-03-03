@@ -9,12 +9,14 @@ class Game {
         document.body.appendChild(this.renderer.domElement);
         this.camera.position.z = 10;
 
+        this.loader = new THREE.GLTFLoader();
+
         // Tạo mặt phẳng
-        const planeGeometry = new THREE.PlaneGeometry(10, 10);
-        const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xcccccc });
-        const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
-        planeMesh.rotation.x = -Math.PI / 2;
-        this.scene.add(planeMesh);
+        // const planeGeometry = new THREE.PlaneGeometry(10, 10);
+        // const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xcccccc });
+        // const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+        // planeMesh.rotation.x = -Math.PI / 2;
+        // this.scene.add(planeMesh);
 
         // Tạo cube
         const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
@@ -69,9 +71,35 @@ class Game {
             }
         });
 
+        this.loadObject('../assets/images/abc2.glb');
+        this.hac = this.scene.children[0];
+
+
+
         document.addEventListener('click', this.onClick.bind(this));
 
     }
+
+    loadObject(url) {
+        this.loader.load(
+            url,
+            (gltf) => {
+                // Lấy đối tượng cần hiển thị từ trong file glb
+                const object = gltf.scene;
+                // Thêm đối tượng vào scene
+                this.scene.add(object);
+                // Lưu lại đối tượng vào biến this.object
+                this.hac = object;
+            },
+            (xhr) => {
+                console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
+            },
+            (error) => {
+                console.error('An error happened', error);
+            }
+        );
+    }
+
 
     onClick(event) {
         // Lấy vị trí chuột trong khoảng viewport
@@ -110,15 +138,22 @@ class Game {
     render() {
         this.cubeMesh.rotation.x += 0.01;
         this.cubeMesh.rotation.y += 0.01;
+
+        // this.hac.scale.set(0.05, 0.05, 0.05);
+        // this.hac.rotation.x += 0.01;
+        this.hac.rotation.x = 0.3;
+        this.hac.rotation.y += 0.01;
         for (let i = 0; i < this.cube.length; i++) {
             this.cube[i].rotation.x += 0.01;
             this.cube[i].rotation.y += 0.01;
             this.cube[i].rotation.z += 0.01;
+            // this.cube[i].position.x = Math.sin(Date.now() * 0.001) * 2;
+            // this.cube[i].position.z = Math.cos(Date.now() * 0.001) * 2;
         }
         requestAnimationFrame(this.render.bind(this));
         this.sphereMesh.position.x = Math.sin(Date.now() * 0.001) * 2;
         this.sphereMesh.position.z = Math.cos(Date.now() * 0.001) * 2;
-        // this.sphereMesh.position.z = Math.cos(Date.now() * 0.001) * 2;
+        this.sphereMesh.position.y = Math.cos(Date.now() * 0.001) * 2;
         this.renderer.render(this.scene, this.camera);
     }
 }
