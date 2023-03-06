@@ -7,7 +7,6 @@ class Game {
         // Đặt camera và renderer
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(this.renderer.domElement);
-        this.camera.position.z = 10;
 
         this.loader = new THREE.GLTFLoader();
 
@@ -61,21 +60,21 @@ class Game {
         // Thêm sự kiện xoay cube khi ấn phím
         document.addEventListener("keydown", (event) => {
             if (event.key === "ArrowLeft") {
-                this.car.position.x -= 0.1;
+                this.car.rotation.y += 0.03;
             } else if (event.key === "ArrowRight") {
-                this.car.position.x += 0.1;
+                this.car.rotation.y -= 0.03;
             } else if (event.key === "ArrowUp") {
-                this.car.position.y += 0.1;
+                this.car.position.z -= 0.1;
             } else if (event.key === "ArrowDown") {
-                this.car.position.y -= 0.1;
+                this.car.position.z += 0.1;
             }
             // space
             if (event.key === " ") {
-                this.car.position.z += 0.1;
+                this.car.position.y += 0.1;
             }
             // shift
             if (event.key === "Shift") {
-                this.car.position.z -= 0.1;
+                this.car.position.y -= 0.1;
             }
         });
 
@@ -98,9 +97,15 @@ class Game {
     update() {
         this.cubeMesh.rotation.x += 0.01;
         this.cubeMesh.rotation.y += 0.01;
-        this.camera.position.x = this.car.position.x;
-        this.camera.position.y = this.car.position.y + 3;
-        this.camera.position.z = this.car.position.z + 10;
+        const distance = 15;
+        const angle = 0;
+        const x = this.car.position.x + distance * Math.sin(this.car.rotation.y + Math.PI);
+        const y = this.car.position.y + distance;
+        const z = this.car.position.z + distance * Math.cos(this.car.rotation.y + Math.PI);
+
+        this.camera.position.set(x, y, z);
+        this.camera.lookAt(this.car.position);
+        // this.camera.rotation.y = -this.car.rotation.y;
         // this.camera.rotation.x = Math.PI / 6;
 
         // this.car.scale.set(0.05, 0.05, 0.05);
