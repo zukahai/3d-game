@@ -61,23 +61,88 @@ class Game {
         // Thêm sự kiện xoay cube khi ấn phím
         document.addEventListener("keydown", (event) => {
             if (event.key === "ArrowLeft") {
-                this.cubeMesh.position.x -= 0.1;
+                this.car.position.x -= 0.1;
             } else if (event.key === "ArrowRight") {
-                this.cubeMesh.position.x += 0.1;
+                this.car.position.x += 0.1;
             } else if (event.key === "ArrowUp") {
-                this.cubeMesh.position.y += 0.1;
+                this.car.position.y += 0.1;
             } else if (event.key === "ArrowDown") {
-                this.cubeMesh.position.y -= 0.1;
+                this.car.position.y -= 0.1;
+            }
+            // space
+            if (event.key === " ") {
+                this.car.position.z += 0.1;
+            }
+            // shift
+            if (event.key === "Shift") {
+                this.car.position.z -= 0.1;
             }
         });
 
         this.loadObject('./assets/images/abc2.glb');
-        this.hac = this.scene.children[0];
+        this.car = this.scene.children[0];
+        this.car.rotation.y = Math.PI;
+
+
+
+
+
+        this.initMap();
 
 
 
         document.addEventListener('click', this.onClick.bind(this));
 
+    }
+
+    update() {
+        this.cubeMesh.rotation.x += 0.01;
+        this.cubeMesh.rotation.y += 0.01;
+        this.camera.position.x = this.car.position.x;
+        this.camera.position.y = this.car.position.y + 3;
+        this.camera.position.z = this.car.position.z + 10;
+        // this.camera.rotation.x = Math.PI / 6;
+
+        // this.car.scale.set(0.05, 0.05, 0.05);
+        // this.car.rotation.x += 0.01;
+        // this.car.rotation.x = Math.PI / 3;
+        // this.car.rotation.y += 0.01;
+        for (let i = 0; i < this.cube.length; i++) {
+            this.cube[i].rotation.x += 0.01;
+            this.cube[i].rotation.y += 0.01;
+            this.cube[i].rotation.z += 0.01;
+            // this.cube[i].position.x = Math.sin(Date.now() * 0.001) * 2;
+            // this.cube[i].position.z = Math.cos(Date.now() * 0.001) * 2;
+        }
+    }
+
+    initMap() {
+        const gridSize = 100;
+        const gridStep = 0.5;
+
+        // tạo một mặt phẳng với PlaneGeometry
+        const geometry = new THREE.PlaneGeometry(gridSize, gridSize);
+        geometry.rotateX(-Math.PI / 2); // quay 90 độ quanh trục ox
+
+        // tạo các điểm để vẽ lưới
+        const vertices = [];
+        for (let i = -gridSize / 2; i <= gridSize / 2; i += gridStep) {
+            vertices.push(i, 0, -gridSize / 2);
+            vertices.push(i, 0, gridSize / 2);
+            vertices.push(-gridSize / 2, 0, i);
+            vertices.push(gridSize / 2, 0, i);
+        }
+
+        // tạo buffer geometry và buffer attribute để lưu trữ các điểm vẽ lưới
+        const gridGeometry = new THREE.BufferGeometry();
+        gridGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+        // tạo vật liệu cho lưới
+        const material = new THREE.LineBasicMaterial({ color: 0xaaaaaa });
+
+        // tạo LineSegments để vẽ lưới
+        this.map = new THREE.LineSegments(gridGeometry, material);
+        this.scene.add(this.map);
     }
 
     loadObject(url) {
@@ -89,7 +154,8 @@ class Game {
                 // Thêm đối tượng vào scene
                 this.scene.add(object);
                 // Lưu lại đối tượng vào biến this.object
-                this.hac = object;
+                this.car = object;
+                this.car.rotation.y = Math.PI;
             },
             (xhr) => {
                 console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
@@ -136,20 +202,7 @@ class Game {
 
     // Render scene
     render() {
-        this.cubeMesh.rotation.x += 0.01;
-        this.cubeMesh.rotation.y += 0.01;
-
-        // this.hac.scale.set(0.05, 0.05, 0.05);
-        // this.hac.rotation.x += 0.01;
-        this.hac.rotation.x = 0.3;
-        this.hac.rotation.y += 0.01;
-        for (let i = 0; i < this.cube.length; i++) {
-            this.cube[i].rotation.x += 0.01;
-            this.cube[i].rotation.y += 0.01;
-            this.cube[i].rotation.z += 0.01;
-            // this.cube[i].position.x = Math.sin(Date.now() * 0.001) * 2;
-            // this.cube[i].position.z = Math.cos(Date.now() * 0.001) * 2;
-        }
+        this.update();
         requestAnimationFrame(this.render.bind(this));
         this.sphereMesh.position.x = Math.sin(Date.now() * 0.001) * 2;
         this.sphereMesh.position.z = Math.cos(Date.now() * 0.001) * 2;
