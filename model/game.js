@@ -45,8 +45,8 @@ class Game {
         }
 
         // Tạo bóng
-        const sphereGeometry = new THREE.SphereGeometry(0.5, 32, 32);
-        const sphereMaterial = new THREE.MeshPhongMaterial({ color: 0x888888 });
+        const sphereGeometry = new THREE.SphereGeometry(5, 320, 320);
+        const sphereMaterial = new THREE.MeshPhongMaterial({ color: 0x0000ff });
         this.sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
         this.sphereMesh.position.set(1, 1, 0);
         this.scene.add(this.sphereMesh);
@@ -89,13 +89,18 @@ class Game {
 
         this.loadObject('./assets/images/abc2.glb');
         this.car2 = this.scene.children[0];
-        this.car2.position.z -= 20;
+        this.car2.position.z -= 10;
+
+        // this.loadObject2('./assets/images/abc3.glb');
+        // this.a = this.scene.children[0];
+
 
 
 
 
 
         this.initMap();
+        this.initSphere();
 
 
 
@@ -134,6 +139,25 @@ class Game {
 
             }
         }
+        // this.a.scale.set(0.005, 0.005, 0.05);
+    }
+
+    initSphere() {
+
+        const geometry = new THREE.SphereGeometry(5, 320, 320); // bán kính 5, 32 đoạn meridian, 32 đoạn vĩ độ
+        const materials = [
+            new THREE.MeshBasicMaterial({ color: 0xff0000 }),
+            new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
+            new THREE.MeshBasicMaterial({ color: 0x0000ff }),
+            new THREE.MeshBasicMaterial({ color: 0xffff00 }),
+            new THREE.MeshBasicMaterial({ color: 0xff00ff }),
+            new THREE.MeshBasicMaterial({ color: 0x00ffff }),
+        ];
+
+        const sphere = new THREE.Mesh(geometry, materials);
+        sphere.position.set(10, 0, 0);
+
+        this.scene.add(sphere);
     }
 
     initMap() {
@@ -186,6 +210,24 @@ class Game {
         );
     }
 
+    loadObject2(url) {
+        this.loader.load(
+            url,
+            (gltf) => {
+                // Lấy đối tượng cần hiển thị từ trong file glb
+                const object = gltf.scene;
+                // Thêm đối tượng vào scene
+                this.scene.add(object);
+            },
+            (xhr) => {
+                console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
+            },
+            (error) => {
+                console.error('An error happened', error);
+            }
+        );
+    }
+
 
     onClick(event) {
         // Lấy vị trí chuột trong khoảng viewport
@@ -224,9 +266,8 @@ class Game {
     render() {
         this.update();
         requestAnimationFrame(this.render.bind(this));
-        this.sphereMesh.position.x = Math.sin(Date.now() * 0.001) * 2;
-        this.sphereMesh.position.z = Math.cos(Date.now() * 0.001) * 2;
-        this.sphereMesh.position.y = Math.cos(Date.now() * 0.001) * 2;
+        this.sphereMesh.position.x = Math.sin(Date.now() * 0.001) * 15;
+        this.sphereMesh.position.z = Math.cos(Date.now() * 0.001) * 15;
         this.renderer.render(this.scene, this.camera);
     }
 }
