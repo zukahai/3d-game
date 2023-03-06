@@ -57,31 +57,20 @@ class Game {
         const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
         directionalLight.position.set(0, 1, 1);
         this.scene.add(directionalLight);
+        this.keycode = [];
 
         // Thêm sự kiện xoay cube khi ấn phím
         document.addEventListener("keydown", (event) => {
-            if (event.key === "ArrowLeft") {
-                this.car.rotation.y += 0.03;
-            } else if (event.key === "ArrowRight") {
-                this.car.rotation.y -= 0.03;
-            } else if (event.key === "ArrowUp") {
-                // update x, z từ this.car.rotation.y
-                this.car.position.x += 0.3 * Math.sin(this.car.rotation.y);
-                this.car.position.z += 0.3 * Math.cos(this.car.rotation.y);
-            } else if (event.key === "ArrowDown") {
-                // update x, z từ this.car.rotation.y
-                this.car.position.x -= 0.3 * Math.sin(this.car.rotation.y);
-                this.car.position.z -= 0.3 * Math.cos(this.car.rotation.y);
-            }
-            // space
-            if (event.key === " ") {
-                this.car.position.y += 1;
-            }
-            // shift
-            if (event.key === "Shift") {
-                this.car.position.y -= 1;
-            }
+            console.log(event.keyCode);
+            this.keycode[event.keyCode] = true;
+            this.keycode[event.keyCode - 2] = false;
+            this.keycode[event.keyCode + 2] = false;
         });
+
+        document.addEventListener("keyup", (event) => {
+            console.log(event.keyCode);
+            this.keycode[event.keyCode] = false;
+        })
 
         this.loadObject('./assets/images/abc2.glb');
         this.car = this.scene.children[0];
@@ -108,7 +97,35 @@ class Game {
 
     }
 
+    move() {
+        if (this.keycode[37])
+            this.car.rotation.y += 0.03;
+        if (this.keycode[39])
+            this.car.rotation.y -= 0.03;
+        if (this.keycode[38]) {
+            // update x, z từ this.car.rotation.y
+            this.car.position.x += 0.3 * Math.sin(this.car.rotation.y);
+            this.car.position.z += 0.3 * Math.cos(this.car.rotation.y);
+        }
+        if (this.keycode[40]) {
+            // update x, z từ this.car.rotation.y
+            this.car.position.x -= 0.3 * Math.sin(this.car.rotation.y);
+            this.car.position.z -= 0.3 * Math.cos(this.car.rotation.y);
+        }
+        // space
+        if (this.keycode[32])
+            this.car.position.y += 1;
+        // shift
+        if (this.keycode[16]) {
+            this.car.position.y -= 1;
+            if (this.car.position.y < 0)
+                this.car.position.y = 0;
+        }
+    }
+
+
     update() {
+        this.move();
         this.cubeMesh.rotation.x += 0.01;
         this.cubeMesh.rotation.y += 0.01;
         const distance = 15;
