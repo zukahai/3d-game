@@ -30,13 +30,14 @@ class Game {
 
         this.cube = [];
 
-        for (let i = 0; i < 5; i++) {
-            let geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+        for (let i = 0; i < 50; i++) {
+            let size = Math.random() * 5 + 0.5;
+            let geometry = new THREE.BoxGeometry(size, size, size);
             let material = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
             const cube = new THREE.Mesh(geometry, material);
-            cube.position.x = (Math.random() - 0.5) * 5;
-            cube.position.y = (Math.random() - 0.5) * 5;
-            cube.position.z = (Math.random() - 0.5) * 5;
+            cube.position.x = (Math.random() - 0.5) * 50;
+            cube.position.y = (Math.random()) * 5;
+            cube.position.z = (Math.random() - 0.5) * 50;
             this.cube[i] = cube;
             this.scene.add(cube);
 
@@ -64,9 +65,13 @@ class Game {
             } else if (event.key === "ArrowRight") {
                 this.car.rotation.y -= 0.03;
             } else if (event.key === "ArrowUp") {
-                this.car.position.z -= 0.1;
+                // update x, z từ this.car.rotation.y
+                this.car.position.x += 0.3 * Math.sin(this.car.rotation.y);
+                this.car.position.z += 0.3 * Math.cos(this.car.rotation.y);
             } else if (event.key === "ArrowDown") {
-                this.car.position.z += 0.1;
+                // update x, z từ this.car.rotation.y
+                this.car.position.x -= 0.3 * Math.sin(this.car.rotation.y);
+                this.car.position.z -= 0.3 * Math.cos(this.car.rotation.y);
             }
             // space
             if (event.key === " ") {
@@ -81,6 +86,10 @@ class Game {
         this.loadObject('./assets/images/abc2.glb');
         this.car = this.scene.children[0];
         this.car.rotation.y = Math.PI;
+
+        this.loadObject('./assets/images/abc2.glb');
+        this.car2 = this.scene.children[0];
+        this.car2.position.z -= 20;
 
 
 
@@ -118,6 +127,12 @@ class Game {
             this.cube[i].rotation.z += 0.01;
             // this.cube[i].position.x = Math.sin(Date.now() * 0.001) * 2;
             // this.cube[i].position.z = Math.cos(Date.now() * 0.001) * 2;
+            if (this.checkCollide(this.cube[i], this.car)) {
+                this.cube[i].material.color.set(0xff0000);
+                this.cube[i].position.x += 0.3 * Math.sin(this.car.rotation.y);
+                this.cube[i].position.z += 0.3 * Math.cos(this.car.rotation.y);
+
+            }
         }
     }
 
