@@ -48,7 +48,7 @@ class Game {
         const sphereGeometry = new THREE.SphereGeometry(5, 320, 320);
         const sphereMaterial = new THREE.MeshPhongMaterial({ color: 0x0000ff });
         this.sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
-        this.sphereMesh.position.set(1, 1, 0);
+        this.sphereMesh.position.set(1, 5, 0);
         this.scene.add(this.sphereMesh);
 
         // Đặt ánh sáng
@@ -75,11 +75,11 @@ class Game {
             }
             // space
             if (event.key === " ") {
-                this.car.position.y += 0.1;
+                this.car.position.y += 1;
             }
             // shift
             if (event.key === "Shift") {
-                this.car.position.y -= 0.1;
+                this.car.position.y -= 1;
             }
         });
 
