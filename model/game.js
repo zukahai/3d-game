@@ -10,13 +10,6 @@ class Game {
 
         this.loader = new THREE.GLTFLoader();
 
-        // Tạo mặt phẳng
-        // const planeGeometry = new THREE.PlaneGeometry(10, 10);
-        // const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xcccccc });
-        // const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
-        // planeMesh.rotation.x = -Math.PI / 2;
-        // this.scene.add(planeMesh);
-
         // Tạo cube
         const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
         const cubeMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 });
@@ -72,25 +65,14 @@ class Game {
             this.keycode[event.keyCode] = false;
         })
 
-        this.loadObject('./assets/images/abc2.glb');
-        this.car = this.scene.children[0];
-        this.car.rotation.y = Math.PI;
-
-        this.loadObject('./assets/images/abc2.glb');
-        this.car2 = this.scene.children[0];
-        this.car2.position.z -= 10;
-
-        this.loadObject2('./assets/images/abc.glb');
-        this.hac = this.scene.children[0];
-
-
-
-
+        this.loadObjectCar = new Object3D('./assets/images/abc2.glb');
+        this.loadObjectCar2 = new Object3D('./assets/images/abc2.glb');
+        this.loadObjectHac = new Object3D('./assets/images/abc.glb', true);
 
 
         this.initMap();
         this.initSphere();
-
+        this.loaded = false;
 
 
         document.addEventListener('click', this.onClick.bind(this));
@@ -123,32 +105,47 @@ class Game {
         }
     }
 
+    loadData() {
+        if (this.loaded)
+            return true;
+        if (this.car && this.car2 && this.hac) {
+            this.scene.add(this.car);
+            this.scene.add(this.car2);
+            this.scene.add(this.hac);
+            this.car.rotation.y = Math.PI;
+            this.hac.scale.set(0.05, 0.05, 0.05);
+            this.hac.position.y = 6;
+            this.loaded = true;
+            return true;
+        } else {
+            this.car = this.loadObjectCar.object;
+            this.car2 = this.loadObjectCar2.object;
+            this.hac = this.loadObjectHac.object;
+        }
+        return false;
+    }
+
 
     update() {
+        if (!this.loadData())
+            return;
         this.move();
         this.cubeMesh.rotation.x += 0.01;
         this.cubeMesh.rotation.y += 0.01;
         const distance = 15;
         const angle = 0;
+
+
         const x = this.car.position.x + distance * Math.sin(this.car.rotation.y + Math.PI);
         const y = this.car.position.y + distance;
         const z = this.car.position.z + distance * Math.cos(this.car.rotation.y + Math.PI);
-
         this.camera.position.set(x, y, z);
         this.camera.lookAt(this.car.position);
-        // this.camera.rotation.y = -this.car.rotation.y;
-        // this.camera.rotation.x = Math.PI / 6;
 
-        // this.car.scale.set(0.05, 0.05, 0.05);
-        // this.car.rotation.x += 0.01;
-        // this.car.rotation.x = Math.PI / 3;
-        // this.car.rotation.y += 0.01;
         for (let i = 0; i < this.cube.length; i++) {
             this.cube[i].rotation.x += 0.01;
             this.cube[i].rotation.y += 0.01;
             this.cube[i].rotation.z += 0.01;
-            // this.cube[i].position.x = Math.sin(Date.now() * 0.001) * 2;
-            // this.cube[i].position.z = Math.cos(Date.now() * 0.001) * 2;
             if (this.checkCollide(this.cube[i], this.car)) {
                 this.cube[i].material.color.set(0xff0000);
                 this.cube[i].position.x += 0.3 * Math.sin(this.car.rotation.y);
@@ -156,15 +153,17 @@ class Game {
 
             }
         }
-        if (this.mixer && this.action) {
-            this.mixer.update(0.03);
-            this.action.play();
+        if (this.loadObjectHac.mixer && this.loadObjectHac.action) {
+            this.loadObjectHac.mixer.update(0.03);
+            this.loadObjectHac.action.play();
         } else
             console.log('action is null');
 
-        this.hac.rotation.y = Date.now() * 0.0003 + Math.PI / 2;
-        this.hac.position.x = Math.sin(Date.now() * 0.0003) * 30;
-        this.hac.position.z = Math.cos(Date.now() * 0.0003) * 30;
+        if (this.hac) {
+            this.hac.rotation.y = Date.now() * 0.0003 + Math.PI / 2;
+            this.hac.position.x = Math.sin(Date.now() * 0.0003) * 30;
+            this.hac.position.z = Math.cos(Date.now() * 0.0003) * 30;
+        }
     }
 
     initSphere() {
@@ -188,60 +187,6 @@ class Game {
     initMap() {
         this.map = new GridMap().map;
         this.scene.add(this.map);
-    }
-
-    loadObject(url) {
-        this.loader.load(
-            url,
-            (gltf) => {
-                // Lấy đối tượng cần hiển thị từ trong file glb
-                const object = gltf.scene;
-                // Thêm đối tượng vào scene
-                this.scene.add(object);
-                // Lưu lại đối tượng vào biến this.object
-                this.car = object;
-                this.car.rotation.y = Math.PI;
-            },
-            (xhr) => {
-                console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
-            },
-            (error) => {
-                console.error('An error happened', error);
-            }
-        );
-    }
-
-    loadObject2(url) {
-        this.loader.load(
-            url,
-            (gltf) => {
-                // Lấy đối tượng cần hiển thị từ trong file glb
-                const object = gltf.scene;
-                const mixer = new THREE.AnimationMixer(object);
-
-                // lấy animation clip
-                const clip = gltf.animations[0];
-
-                // tạo action để chơi animation
-                const action = mixer.clipAction(clip);
-
-                // chạy action
-                action.play();
-                object.scale.set(0.1, 0.1, 0.1);
-                object.position.set(10, 5, 0);
-                // Thêm đối tượng vào scene
-                this.scene.add(object);
-                this.mixer = mixer;
-                this.action = action;
-                this.hac = object;
-            },
-            (xhr) => {
-                console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
-            },
-            (error) => {
-                console.error('An error happened', error);
-            }
-        );
     }
 
 
@@ -273,6 +218,8 @@ class Game {
 
 
     checkCollide(object1, object2) {
+        if (!object1 || !object2)
+            return false;
         const box1 = new THREE.Box3().setFromObject(object1);
         const box2 = new THREE.Box3().setFromObject(object2);
         return box1.intersectsBox(box2);
