@@ -54,14 +54,14 @@ class Game {
 
         // Thêm sự kiện xoay cube khi ấn phím
         document.addEventListener("keydown", (event) => {
-            console.log(event.keyCode);
+            // console.log(event.keyCode);
             this.keycode[event.keyCode] = true;
             this.keycode[event.keyCode - 2] = false;
             this.keycode[event.keyCode + 2] = false;
         });
 
         document.addEventListener("keyup", (event) => {
-            console.log(event.keyCode);
+            // console.log(event.keyCode);
             this.keycode[event.keyCode] = false;
         })
 
@@ -115,6 +115,10 @@ class Game {
             this.car.rotation.y = Math.PI;
             this.hac.scale.set(0.05, 0.05, 0.05);
             this.hac.position.y = 6;
+
+            this.car2.scale.set(2, 2, 2);
+            this.car2.position.x = 10;
+
             this.loaded = true;
             return true;
         } else {
@@ -148,9 +152,16 @@ class Game {
             this.cube[i].rotation.z += 0.01;
             if (this.checkCollide(this.cube[i], this.car)) {
                 this.cube[i].material.color.set(0xff0000);
+                //Random color
+                this.cube[i].material.color.set(Math.random() * 0xffffff, Math.random() * 0xffffff, Math.random() * 0xffffff);
                 this.cube[i].position.x += 0.3 * Math.sin(this.car.rotation.y);
                 this.cube[i].position.z += 0.3 * Math.cos(this.car.rotation.y);
 
+            }
+
+            if (this.checkCollide(this.car, this.car2)) {
+                this.car2.position.x += 0.3 * Math.sin(this.car.rotation.y);
+                this.car2.position.z += 0.3 * Math.cos(this.car.rotation.y);
             }
         }
         if (this.loadObjectHac.mixer && this.loadObjectHac.action) {

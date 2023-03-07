@@ -1,7 +1,7 @@
 class GridMap {
     constructor() {
         const gridSize = 100;
-        const gridStep = 0.5;
+        const gridStep = 0.3;
 
         // tạo một mặt phẳng với PlaneGeometry
         const geometry = new THREE.PlaneGeometry(gridSize, gridSize);
@@ -21,7 +21,7 @@ class GridMap {
         gridGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
 
         // tạo vật liệu cho lưới
-        const material = new THREE.LineBasicMaterial({ color: 0xaaaaaa });
+        const material = new THREE.LineBasicMaterial({ color: 0x576278 });
 
         // tạo LineSegments để vẽ lưới
         this.map = new THREE.LineSegments(gridGeometry, material);

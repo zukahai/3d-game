@@ -7,7 +7,6 @@ class Object3D {
     }
 
     loop() {
-        console.log("Hello");
         this.loadObject(this.url);
         if (!this.object)
             requestAnimationFrame(this.loop.bind(this));
