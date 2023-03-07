@@ -1,4 +1,4 @@
-class Map {
+class GridMap {
     constructor() {
         const gridSize = 100;
         const gridStep = 0.5;
