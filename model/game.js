@@ -80,8 +80,8 @@ class Game {
         this.car2 = this.scene.children[0];
         this.car2.position.z -= 10;
 
-        // this.loadObject2('./assets/images/abc3.glb');
-        // this.a = this.scene.children[0];
+        this.loadObject2('./assets/images/abc.glb');
+        this.hac = this.scene.children[0];
 
 
 
@@ -156,7 +156,15 @@ class Game {
 
             }
         }
-        // this.a.scale.set(0.005, 0.005, 0.05);
+        if (this.mixer && this.action) {
+            this.mixer.update(0.03);
+            this.action.play();
+        } else
+            console.log('action is null');
+
+        this.hac.rotation.y = Date.now() * 0.0003 + Math.PI / 2;
+        this.hac.position.x = Math.sin(Date.now() * 0.0003) * 30;
+        this.hac.position.z = Math.cos(Date.now() * 0.0003) * 30;
     }
 
     initSphere() {
@@ -233,8 +241,23 @@ class Game {
             (gltf) => {
                 // Lấy đối tượng cần hiển thị từ trong file glb
                 const object = gltf.scene;
+                const mixer = new THREE.AnimationMixer(object);
+
+                // lấy animation clip
+                const clip = gltf.animations[0];
+
+                // tạo action để chơi animation
+                const action = mixer.clipAction(clip);
+
+                // chạy action
+                action.play();
+                object.scale.set(0.1, 0.1, 0.1);
+                object.position.set(10, 5, 0);
                 // Thêm đối tượng vào scene
                 this.scene.add(object);
+                this.mixer = mixer;
+                this.action = action;
+                this.hac = object;
             },
             (xhr) => {
                 console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
@@ -285,6 +308,7 @@ class Game {
         requestAnimationFrame(this.render.bind(this));
         this.sphereMesh.position.x = Math.sin(Date.now() * 0.001) * 15;
         this.sphereMesh.position.z = Math.cos(Date.now() * 0.001) * 15;
+
         this.renderer.render(this.scene, this.camera);
     }
 }
