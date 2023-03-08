@@ -73,7 +73,7 @@ class Game {
         });
 
         this.loadObjectCar = new Object3D('./assets/images/car.glb');
-        this.loadObjectGun = new Object3D('./assets/images/76mm_oto-melara_gun.glb');
+        this.loadObjectGun = new Object3D('./assets/images/small_glytchbug.glb');
         this.loadObjectCar2 = new Object3D('./assets/images/car.glb');
         this.loadObjectHac = new Object3D('./assets/images/abc.glb', true);
 
@@ -150,10 +150,11 @@ class Game {
             this.car2.position.x = 10;
 
             this.gun.position.set(10, 10, 10);
+            // this.gun.scale.set(0.01, 0.01, 0.01);
 
             for (let i = 0; i < this.loadObjectMonter.length; i++) {
                 this.scene.add(this.monter[i]);
-                this.monter[i].position.set((Math.random() - Math.random()) * 50, Math.random() * 2 + 0.25, (Math.random() - Math.random()) * 30);
+                this.monter[i].position.set((Math.random() - Math.random()) * 50, Math.random() * 3.5 + 0.25, (Math.random() - Math.random()) * 30);
                 this.monter[i].scale.set(0.03, 0.03, 0.03);
                 this.monter[i].rotation.y = Math.random() * Math.PI;
             }
@@ -229,8 +230,8 @@ class Game {
         this.hac.position.x = Math.sin(Date.now() * 0.0003) * 30;
         this.hac.position.z = Math.cos(Date.now() * 0.0003) * 30;
 
-        this.gun.position.set(this.car.position.x, this.car.position.y + 2.5, this.car.position.z);
-        this.gun.rotation.y = this.car.rotation.y + Math.PI - this.angleGun;
+        this.gun.position.set(this.car.position.x, this.car.position.y + 3.5, this.car.position.z);
+        this.gun.rotation.y = this.car.rotation.y - this.angleGun;
     }
 
     initSphere() {
