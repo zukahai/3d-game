@@ -65,6 +65,13 @@ class Game {
             this.keycode[event.keyCode] = false;
         })
 
+        document.addEventListener("mousemove", (event) => {
+            let x = event.clientX - window.innerWidth / 2;
+            let y = window.innerHeight / 2 - event.clientY;
+            let angle = Math.atan2(y, x) * 180 / Math.PI;
+            this.angleGun = Math.PI / 2 - (angle / 180 * Math.PI);
+        });
+
         this.loadObjectCar = new Object3D('./assets/images/car.glb');
         this.loadObjectGun = new Object3D('./assets/images/76mm_oto-melara_gun.glb');
         this.loadObjectCar2 = new Object3D('./assets/images/car.glb');
@@ -223,6 +230,7 @@ class Game {
         this.hac.position.z = Math.cos(Date.now() * 0.0003) * 30;
 
         this.gun.position.set(this.car.position.x, this.car.position.y + 2.5, this.car.position.z);
+        this.gun.rotation.y = this.car.rotation.y + Math.PI - this.angleGun;
     }
 
     initSphere() {
