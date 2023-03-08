@@ -146,8 +146,8 @@ class Game {
 
             for (let i = 0; i < this.loadObjectMonter.length; i++) {
                 this.scene.add(this.monter[i]);
-                this.monter[i].position.set(Math.random() * 100 - 5, Math.random() * 10 + 2, (Math.random() - Math.random()) * 30);
-                this.monter[i].scale.set(0.05, 0.05, 0.05);
+                this.monter[i].position.set((Math.random() - Math.random()) * 50, Math.random() * 2 + 0.25, (Math.random() - Math.random()) * 30);
+                this.monter[i].scale.set(0.03, 0.03, 0.03);
                 this.monter[i].rotation.y = Math.random() * Math.PI;
             }
 
@@ -170,15 +170,17 @@ class Game {
         this.move();
         this.cubeMesh.rotation.x += 0.01;
         this.cubeMesh.rotation.y += 0.01;
-        const distance = 15;
-        const angle = 0;
-
+        const distance = 20;
 
         const x = this.car.position.x + distance * Math.sin(this.car.rotation.y + Math.PI);
         const y = this.car.position.y + distance;
         const z = this.car.position.z + distance * Math.cos(this.car.rotation.y + Math.PI);
         this.camera.position.set(x, y, z);
+
         this.camera.lookAt(this.car.position);
+        // this.camera.rotation.x = THREE.MathUtils.degToRad(30);
+        // this.camera.rotation.y = this.car.rotation.y;
+
 
         for (let i = 0; i < this.cube.length; i++) {
             this.cube[i].rotation.x += 0.01;
@@ -198,19 +200,22 @@ class Game {
                 this.car2.position.z += 0.3 * Math.cos(this.car.rotation.y);
             }
         }
-        // if (this.loadObjectHac.mixer && this.loadObjectHac.action) {
-        //     this.loadObjectHac.mixer.update(0.03);
-        //     this.loadObjectHac.action.play();
-        // } else
-        //     console.log('action is null');
 
-        // for (let i = 0; i < this.loadObjectMonter.length; i++) {
-        //     if (this.loadObjectMonter[i].mixer && this.loadObjectMonter[i].action) {
-        //         this.loadObjectMonter[i].mixer.update(0.01);
-        //         this.loadObjectMonter[i].action.play();
-        //     } else
-        //         console.log('Monter action is null');
-        // }
+        for (let i = 0; i < this.monter.length; i++) {
+            this.monter[i].position.x += 0.1 * Math.sin(this.monter[i].rotation.y);
+            this.monter[i].position.z += 0.1 * Math.cos(this.monter[i].rotation.y);
+
+            if (Math.sqrt(Math.pow(this.monter[i].position.x, 2) + Math.pow(this.monter[i].position.z, 2)) > 100) {
+                this.monter[i].rotation.y += Math.PI * Math.random();
+                let x = this.monter[i].position.x;
+                let z = this.monter[i].position.z;
+                do {
+                    this.monter[i].rotation.y += Math.PI * Math.random();
+                    x = this.monter[i].position.x + 0.1 * Math.sin(this.monter[i].rotation.y);
+                    z = this.monter[i].position.z + 0.1 * Math.cos(this.monter[i].rotation.y);
+                } while (Math.sqrt(Math.pow(x, 2) + Math.pow(z, 2)) > 100);
+            }
+        }
 
 
         this.hac.rotation.y = Date.now() * 0.0003 + Math.PI / 2;

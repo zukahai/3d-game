@@ -1,7 +1,7 @@
 class GridMap {
     constructor() {
-        const gridSize = 100;
-        const gridStep = 0.3;
+        const gridSize = 200;
+        const gridStep = 1;
 
         // tạo một mặt phẳng với PlaneGeometry
         const geometry = new THREE.PlaneGeometry(gridSize, gridSize);
