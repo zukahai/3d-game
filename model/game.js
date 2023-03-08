@@ -23,7 +23,7 @@ class Game {
 
         this.cube = [];
 
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 10; i++) {
             let size = Math.random() * 5 + 0.5;
             let geometry = new THREE.BoxGeometry(size, size, size);
             let material = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
@@ -65,8 +65,9 @@ class Game {
             this.keycode[event.keyCode] = false;
         })
 
-        this.loadObjectCar = new Object3D('./assets/images/abc2.glb');
-        this.loadObjectCar2 = new Object3D('./assets/images/abc2.glb');
+        this.loadObjectCar = new Object3D('./assets/images/car.glb');
+        this.loadObjectGun = new Object3D('./assets/images/76mm_oto-melara_gun.glb');
+        this.loadObjectCar2 = new Object3D('./assets/images/car.glb');
         this.loadObjectHac = new Object3D('./assets/images/abc.glb', true);
 
 
@@ -108,8 +109,9 @@ class Game {
     loadData() {
         if (this.loaded)
             return true;
-        if (this.car && this.car2 && this.hac) {
+        if (this.car && this.car2 && this.hac && this.gun) {
             this.scene.add(this.car);
+            this.scene.add(this.gun);
             this.scene.add(this.car2);
             this.scene.add(this.hac);
             this.car.rotation.y = Math.PI;
@@ -119,10 +121,13 @@ class Game {
             this.car2.scale.set(2, 2, 2);
             this.car2.position.x = 10;
 
+            this.gun.position.set(10, 10, 10);
+
             this.loaded = true;
             return true;
         } else {
             this.car = this.loadObjectCar.object;
+            this.gun = this.loadObjectGun.object;
             this.car2 = this.loadObjectCar2.object;
             this.hac = this.loadObjectHac.object;
         }
@@ -170,11 +175,12 @@ class Game {
         } else
             console.log('action is null');
 
-        if (this.hac) {
-            this.hac.rotation.y = Date.now() * 0.0003 + Math.PI / 2;
-            this.hac.position.x = Math.sin(Date.now() * 0.0003) * 30;
-            this.hac.position.z = Math.cos(Date.now() * 0.0003) * 30;
-        }
+
+        this.hac.rotation.y = Date.now() * 0.0003 + Math.PI / 2;
+        this.hac.position.x = Math.sin(Date.now() * 0.0003) * 30;
+        this.hac.position.z = Math.cos(Date.now() * 0.0003) * 30;
+
+        this.gun.position.set(this.car.position.x, this.car.position.y + 2.5, this.car.position.z);
     }
 
     initSphere() {

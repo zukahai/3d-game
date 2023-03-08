@@ -18,7 +18,10 @@ class Object3D {
             url,
             (gltf) => {
                 // Lấy đối tượng cần hiển thị từ trong file glb
-                const object = gltf.scene;
+                let object = gltf.scene;
+                // if (!object)
+                //     object = gltf.scene[gltf.scene.children[0]];
+
                 this.object = object;
 
                 if (this.action) {
