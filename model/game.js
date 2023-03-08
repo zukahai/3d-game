@@ -71,6 +71,13 @@ class Game {
         this.loadObjectHac = new Object3D('./assets/images/abc.glb', true);
 
 
+        this.loadObjectMonter = [];
+        this.monter = [];
+        for (let i = 0; i < 5; i++) {
+            this.loadObjectMonter[i] = new Object3D('./assets/images/tori_fly.glb', true);
+        }
+
+
         this.initMap();
         this.initSphere();
         this.loaded = false;
@@ -106,10 +113,24 @@ class Game {
         }
     }
 
+    checkLoadMonter() {
+        for (let i = 0; i < this.loadObjectMonter.length; i++) {
+            if (!this.monter[i])
+                return false;
+        }
+        return true;
+    }
+
+    setMonters() {
+        for (let i = 0; i < this.loadObjectMonter.length; i++) {
+            this.monter[i] = this.loadObjectMonter[i].object;
+        }
+    }
+
     loadData() {
         if (this.loaded)
             return true;
-        if (this.car && this.car2 && this.hac && this.gun) {
+        if (this.car && this.car2 && this.hac && this.gun && this.checkLoadMonter()) {
             this.scene.add(this.car);
             this.scene.add(this.gun);
             this.scene.add(this.car2);
@@ -123,6 +144,13 @@ class Game {
 
             this.gun.position.set(10, 10, 10);
 
+            for (let i = 0; i < this.loadObjectMonter.length; i++) {
+                this.scene.add(this.monter[i]);
+                this.monter[i].position.set(Math.random() * 100 - 5, Math.random() * 10 + 2, (Math.random() - Math.random()) * 30);
+                this.monter[i].scale.set(0.05, 0.05, 0.05);
+                this.monter[i].rotation.y = Math.random() * Math.PI;
+            }
+
             this.loaded = true;
             return true;
         } else {
@@ -130,6 +158,7 @@ class Game {
             this.gun = this.loadObjectGun.object;
             this.car2 = this.loadObjectCar2.object;
             this.hac = this.loadObjectHac.object;
+            this.setMonters();
         }
         return false;
     }
@@ -169,11 +198,19 @@ class Game {
                 this.car2.position.z += 0.3 * Math.cos(this.car.rotation.y);
             }
         }
-        if (this.loadObjectHac.mixer && this.loadObjectHac.action) {
-            this.loadObjectHac.mixer.update(0.03);
-            this.loadObjectHac.action.play();
-        } else
-            console.log('action is null');
+        // if (this.loadObjectHac.mixer && this.loadObjectHac.action) {
+        //     this.loadObjectHac.mixer.update(0.03);
+        //     this.loadObjectHac.action.play();
+        // } else
+        //     console.log('action is null');
+
+        // for (let i = 0; i < this.loadObjectMonter.length; i++) {
+        //     if (this.loadObjectMonter[i].mixer && this.loadObjectMonter[i].action) {
+        //         this.loadObjectMonter[i].mixer.update(0.01);
+        //         this.loadObjectMonter[i].action.play();
+        //     } else
+        //         console.log('Monter action is null');
+        // }
 
 
         this.hac.rotation.y = Date.now() * 0.0003 + Math.PI / 2;

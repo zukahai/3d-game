@@ -14,39 +14,31 @@ class Object3D {
     }
 
     loadObject(url) {
-        this.loader.load(
-            url,
-            (gltf) => {
-                // Lấy đối tượng cần hiển thị từ trong file glb
-                let object = gltf.scene;
-                // if (!object)
-                //     object = gltf.scene[gltf.scene.children[0]];
+        this.loader.load(url, (gltf) => {
+            this.object = gltf.scene;
+            const animations = gltf.animations;
+            const mixer = new THREE.AnimationMixer(gltf.scene);
 
-                this.object = object;
+            // Tạo một instance của AnimationAction cho mỗi animation
+            const animationActions = animations.map((animation) => {
+                return mixer.clipAction(animation);
+            });
 
-                if (this.action) {
-                    const mixer = new THREE.AnimationMixer(object);
+            // Chạy tất cả các animation
+            // animationActions.forEach((animationAction) => {
+            //     animationAction.play();
+            // });
+            if (animationActions[0])
+                animationActions[0].play();
 
-                    // lấy animation clip
-                    const clip = gltf.animations[0];
-
-                    // tạo action để chơi animation
-                    const action = mixer.clipAction(clip);
-
-                    // chạy action
-                    action.play();
-
-
-                    this.mixer = mixer;
-                    this.action = action;
-                }
-            },
-            (xhr) => {
-                console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
-            },
-            (error) => {
-                console.error('An error happened', error);
-            }
-        );
+            // Đăng ký hàm update cho AnimationMixer
+            const clock = new THREE.Clock();
+            const update = () => {
+                const delta = clock.getDelta();
+                mixer.update(delta);
+                requestAnimationFrame(update);
+            };
+            update();
+        });
     }
 }
