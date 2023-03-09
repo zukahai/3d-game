@@ -54,10 +54,36 @@ class Game {
 
         // Thêm sự kiện xoay cube khi ấn phím
         document.addEventListener("keydown", (event) => {
-            // console.log(event.keyCode);
+            console.log(event.keyCode);
             this.keycode[event.keyCode] = true;
-            this.keycode[event.keyCode - 2] = false;
-            this.keycode[event.keyCode + 2] = false;
+            switch (event.keyCode) {
+                case 37:
+                    this.keycode[39] = this.keycode[68] = false;
+                    break;
+                case 38:
+                    this.keycode[40] = this.keycode[83] = false;
+                    break;
+                case 39:
+                    this.keycode[37] = this.keycode[65] = false;
+                    break;
+                case 40:
+                    this.keycode[38] = this.keycode[87] = false;
+                    break;
+                case 65:
+                    this.keycode[68] = this.keycode[39] = false;
+                    break;
+                case 87:
+                    this.keycode[37] = this.keycode[65] = false;
+                    break;
+                case 83:
+                    this.keycode[38] = this.keycode[87] = false;
+                    break;
+                case 68:
+                    this.keycode[37] = this.keycode[65] = false;
+                    break;
+
+
+            }
         });
 
         document.addEventListener("keyup", (event) => {
@@ -80,7 +106,7 @@ class Game {
 
         this.loadObjectMonter = [];
         this.monter = [];
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 2; i++) {
             this.loadObjectMonter[i] = new Object3D('./assets/images/tori_fly.glb', true);
         }
 
@@ -95,16 +121,16 @@ class Game {
     }
 
     move() {
-        if (this.keycode[37])
+        if (this.keycode[37] || this.keycode[65])
             this.car.rotation.y += 0.03;
-        if (this.keycode[39])
+        if (this.keycode[39] || this.keycode[68])
             this.car.rotation.y -= 0.03;
-        if (this.keycode[38]) {
+        if (this.keycode[38] || this.keycode[87]) {
             // update x, z từ this.car.rotation.y
             this.car.position.x += 0.3 * Math.sin(this.car.rotation.y);
             this.car.position.z += 0.3 * Math.cos(this.car.rotation.y);
         }
-        if (this.keycode[40]) {
+        if (this.keycode[40] || this.keycode[83]) {
             // update x, z từ this.car.rotation.y
             this.car.position.x -= 0.3 * Math.sin(this.car.rotation.y);
             this.car.position.z -= 0.3 * Math.cos(this.car.rotation.y);
