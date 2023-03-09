@@ -207,7 +207,7 @@ class Game {
             for (let i = 0; i < this.monters.length; i++) {
                 this.scene.add(this.monters[i]);
                 this.monters[i].position.set((Math.random() - Math.random()) * 50, Math.random() * 3.5 + 0.25, (Math.random() - Math.random()) * 30);
-                this.monters[i].scale.set(0.03, 0.03, 0.03);
+                this.monters[i].scale.set(0.05, 0.05, 0.05);
                 this.monters[i].rotation.y = Math.random() * Math.PI;
             }
 
@@ -293,10 +293,23 @@ class Game {
         this.gun.rotation.y = this.car.rotation.y - this.angleGun;
 
 
+        let idMonter = -1;
         for (let i = 0; i < this.bulletManager.bullets.length; i++) {
             for (let j = 0; j < this.monters.length; j++) {
-
+                if (this.checkCollide(this.bulletManager.bullets[i], this.monters[j])) {
+                    this.bulletManager.bullets[i].visible = false;
+                    let scale = this.monters[j].scale.x;
+                    let newScale = scale * 0.999;
+                    this.monters[j].scale.set(newScale, newScale, newScale);
+                    if (newScale < 0.02) {
+                        idMonter = j;
+                    }
+                }
             }
+        }
+        if (idMonter != -1) {
+            this.scene.remove(this.monters[idMonter]);
+            this.monters.splice(idMonter, 1);
         }
     }
 
