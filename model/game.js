@@ -98,6 +98,13 @@ class Game {
             this.angleGun = Math.PI / 2 - (angle / 180 * Math.PI);
         });
 
+        document.addEventListener("mousedown", (event) => {
+            let x = event.clientX;
+            let y = event.clientY;
+            console.log(x, y);
+            this.bulletManager.addBullet({ x: this.car.position.x, y: this.car.position.y, z: this.car.position.z, rotate: this.car.rotation.y - this.angleGun });
+        })
+
         this.loadObjectCar = new Object3D('./assets/images/car.glb');
         this.loadObjectGun = new Object3D('./assets/images/small_glytchbug.glb');
         this.loadObjectCar2 = new Object3D('./assets/images/car.glb');
@@ -114,6 +121,7 @@ class Game {
         this.initMap();
         this.initSphere();
         this.loaded = false;
+        this.bulletManager = new BulletManager(this.scene);
 
 
         document.addEventListener('click', this.onClick.bind(this));
@@ -251,6 +259,7 @@ class Game {
             }
         }
 
+        this.bulletManager.setLastBullet();
 
         this.hac.rotation.y = Date.now() * 0.0003 + Math.PI / 2;
         this.hac.position.x = Math.sin(Date.now() * 0.0003) * 30;
