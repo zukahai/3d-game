@@ -2,51 +2,70 @@ class BulletManager {
     constructor(scene) {
         this.scene = scene;
         this.bullets = [];
-        this.bulletCount = 0;
+        this.bulletCount = 20;
         this.bulletSpeed = 1.5;
-        this.loadObjectBullet = [];
+        this.loadObject = [];
+        for (let i = 0; i < this.bulletCount; i++)
+            this.loadObject[i] = new Object3D('./assets/images/lazer_bullet.glb');
+        this.bulletQueue = [];
+        for (let i = 0; i < this.bulletCount; i++)
+            this.bulletQueue[i] = this.loadObject[i].object;
         this.positions = [];
+        this.index = 0;
     }
 
     addBullet(position) {
-        let N = this.bullets.length;
-        this.loadObjectBullet[N] = new Object3D('./assets/images/lazer_bullet.glb');
-        this.positions[N] = position;
+        this.loadBulletQueue();
+        if (this.bulletQueue[this.index]) {
+            console.log(this.index);
+            let N = this.bullets.length;
+            this.bullets[N] = this.bulletQueue[this.index];
+            this.positions[N] = position;
+            this.bullets[N].visible = true;
+            this.bullets[N].position.set(this.positions[N].x, this.positions[N].y + 3, this.positions[N].z);
+            this.bullets[N].rotation.y = this.positions[N].rotate + Math.PI;
+            this.scene.add(this.bullets[N]);
+            this.bullets[N].scale.set(0.02, 0.02, 0.02);
+            this.bullets[N].position.x += 1.5 * Math.sin(this.bullets[N].rotation.y + Math.PI);
+            this.bullets[N].position.z += 1.5 * Math.cos(this.bullets[N].rotation.y + Math.PI);
+            this.index++;
+            if (this.index >= this.bulletCount) {
+                this.index = 0;
+            }
+        } else {
+            this.bulletQueue[this.index] = this.loadObject[this.index].object;
+        }
+
+    }
+
+    loadBulletQueue() {
+        for (let i = 0; i < this.bulletCount; i++) {
+            if (!this.bulletQueue[i])
+                this.bulletQueue[i] = this.loadObject[i].object;
+        }
     }
 
     removeBullet(id) {
         let id_bullet = this.bullets[id].id;
-        this.scene.remove(this.scene.getObjectById(id_bullet));
+        this.bullets[id].visible = false;
         this.bullets.splice(id, 1);
         this.positions.splice(id, 1);
-        this.loadObjectBullet.splice(id, 1);
     }
 
     setLastBullet() {
-        let N = this.loadObjectBullet.length - 1;
+        let N = this.bullets.length - 1;
         let ids = []
         for (let i = 0; i <= N; i++) {
-            if (this.bullets[i]) {
-                if (this.scene.getObjectById(this.bullets[i].id) === undefined) {
-                    this.bullets[i].position.set(this.positions[i].x, this.positions[i].y + 3, this.positions[i].z);
-                    this.bullets[i].rotation.y = this.positions[i].rotate + Math.PI;
-                    this.scene.add(this.bullets[i]);
-                    this.bullets[i].scale.set(0.02, 0.02, 0.02);
-                    this.bullets[i].position.x += 1.5 * Math.sin(this.bullets[i].rotation.y + Math.PI);
-                    this.bullets[i].position.z += 1.5 * Math.cos(this.bullets[i].rotation.y + Math.PI);
-                } else {
-                    this.bullets[i].position.x += this.bulletSpeed * Math.sin(this.bullets[i].rotation.y + Math.PI);
-                    this.bullets[i].position.z += this.bulletSpeed * Math.cos(this.bullets[i].rotation.y + Math.PI);
-                    let distance = this.bullets[i].position.distanceTo(this.positions[i]);
-                    if (distance > 200) {
-                        ids.push(this.bullets[i]);
-                    }
-                }
 
-            } else {
-                this.bullets[i] = this.loadObjectBullet[i].object;
+            this.bullets[i].position.x += this.bulletSpeed * Math.sin(this.bullets[i].rotation.y + Math.PI);
+            this.bullets[i].position.z += this.bulletSpeed * Math.cos(this.bullets[i].rotation.y + Math.PI);
+            let distance = this.bullets[i].position.distanceTo(this.positions[i]);
+            if (distance > 200) {
+                ids.push(this.bullets[i]);
             }
         }
+
+
         if (ids.length > 0) {
             this.removeBullet(0);
         }

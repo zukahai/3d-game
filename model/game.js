@@ -54,7 +54,7 @@ class Game {
 
         // Thêm sự kiện xoay cube khi ấn phím
         document.addEventListener("keydown", (event) => {
-            console.log(event.keyCode);
+            // console.log(event.keyCode);
             this.keycode[event.keyCode] = true;
             switch (event.keyCode) {
                 case 37:
