@@ -93,7 +93,7 @@ class Game {
 
         document.addEventListener("mousemove", (event) => {
             let x = event.clientX - window.innerWidth / 2;
-            let y = window.innerHeight / 2 - event.clientY;
+            let y = 3 * window.innerHeight / 4 - event.clientY;
             let angle = Math.atan2(y, x) * 180 / Math.PI;
             this.angleGun = Math.PI / 2 - (angle / 180 * Math.PI);
         });
@@ -101,8 +101,26 @@ class Game {
         document.addEventListener("mousedown", (event) => {
             let x = event.clientX;
             let y = event.clientY;
-            console.log(x, y);
-            this.bulletManager.addBullet({ x: this.car.position.x, y: this.car.position.y, z: this.car.position.z, rotate: this.car.rotation.y - this.angleGun });
+
+            const mouse = new THREE.Vector2(
+                (event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1
+            );
+
+            // Lấy đối tượng được click
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(mouse, this.camera);
+
+            for (let i = 0; i < this.cube.length; i++) {
+                if (this.checkClick(raycaster, this.cube[i])) {
+                    this.cube[i].visible = false;
+                }
+            }
+            let position = (this.checkClick(raycaster, new GridMap().ortherMap()));
+
+            let X = position.x - this.car.position.x;
+            let Z = position.z - this.car.position.z;
+            let angle = Math.atan2(Z, X);
+            this.bulletManager.addBullet({ x: this.car.position.x, y: this.car.position.y, z: this.car.position.z, rotate: Math.PI / 2 - angle });
         })
 
         this.loadObjectCar = new Object3D('./assets/images/car.glb');
@@ -111,10 +129,10 @@ class Game {
         this.loadObjectHac = new Object3D('./assets/images/abc.glb', true);
 
 
-        this.loadObjectMonter = [];
-        this.monter = [];
+        this.loadObjectMonters = [];
+        this.monters = [];
         for (let i = 0; i < 2; i++) {
-            this.loadObjectMonter[i] = new Object3D('./assets/images/tori_fly.glb', true);
+            this.loadObjectMonters[i] = new Object3D('./assets/images/tori_fly.glb', true);
         }
 
 
@@ -130,9 +148,9 @@ class Game {
 
     move() {
         if (this.keycode[37] || this.keycode[65])
-            this.car.rotation.y += 0.03;
+            this.car.rotation.y += 0.02;
         if (this.keycode[39] || this.keycode[68])
-            this.car.rotation.y -= 0.03;
+            this.car.rotation.y -= 0.02;
         if (this.keycode[38] || this.keycode[87]) {
             // update x, z từ this.car.rotation.y
             this.car.position.x += 0.3 * Math.sin(this.car.rotation.y);
@@ -155,16 +173,16 @@ class Game {
     }
 
     checkLoadMonter() {
-        for (let i = 0; i < this.loadObjectMonter.length; i++) {
-            if (!this.monter[i])
+        for (let i = 0; i < this.monters.length; i++) {
+            if (!this.monters[i])
                 return false;
         }
         return true;
     }
 
     setMonters() {
-        for (let i = 0; i < this.loadObjectMonter.length; i++) {
-            this.monter[i] = this.loadObjectMonter[i].object;
+        for (let i = 0; i < this.loadObjectMonters.length; i++) {
+            this.monters[i] = this.loadObjectMonters[i].object;
         }
     }
 
@@ -186,11 +204,11 @@ class Game {
             this.gun.position.set(10, 10, 10);
             // this.gun.scale.set(0.01, 0.01, 0.01);
 
-            for (let i = 0; i < this.loadObjectMonter.length; i++) {
-                this.scene.add(this.monter[i]);
-                this.monter[i].position.set((Math.random() - Math.random()) * 50, Math.random() * 3.5 + 0.25, (Math.random() - Math.random()) * 30);
-                this.monter[i].scale.set(0.03, 0.03, 0.03);
-                this.monter[i].rotation.y = Math.random() * Math.PI;
+            for (let i = 0; i < this.monters.length; i++) {
+                this.scene.add(this.monters[i]);
+                this.monters[i].position.set((Math.random() - Math.random()) * 50, Math.random() * 3.5 + 0.25, (Math.random() - Math.random()) * 30);
+                this.monters[i].scale.set(0.03, 0.03, 0.03);
+                this.monters[i].rotation.y = Math.random() * Math.PI;
             }
 
             this.loaded = true;
@@ -212,14 +230,20 @@ class Game {
         this.move();
         this.cubeMesh.rotation.x += 0.01;
         this.cubeMesh.rotation.y += 0.01;
-        const distance = 20;
+        const distance = 12;
 
         const x = this.car.position.x + distance * Math.sin(this.car.rotation.y + Math.PI);
         const y = this.car.position.y + distance;
         const z = this.car.position.z + distance * Math.cos(this.car.rotation.y + Math.PI);
+
+        const x2 = this.car.position.x + distance * Math.sin(this.car.rotation.y);
+        const y2 = this.car.position.y + distance / 10;
+        const z2 = this.car.position.z + distance * Math.cos(this.car.rotation.y);
+
+        let position = new THREE.Vector3(x2, y2, z2);
         this.camera.position.set(x, y, z);
 
-        this.camera.lookAt(this.car.position);
+        this.camera.lookAt(position);
         // this.camera.rotation.x = THREE.MathUtils.degToRad(30);
         // this.camera.rotation.y = this.car.rotation.y;
 
@@ -243,18 +267,18 @@ class Game {
             }
         }
 
-        for (let i = 0; i < this.monter.length; i++) {
-            this.monter[i].position.x += 0.1 * Math.sin(this.monter[i].rotation.y);
-            this.monter[i].position.z += 0.1 * Math.cos(this.monter[i].rotation.y);
+        for (let i = 0; i < this.monters.length; i++) {
+            this.monters[i].position.x += 0.1 * Math.sin(this.monters[i].rotation.y);
+            this.monters[i].position.z += 0.1 * Math.cos(this.monters[i].rotation.y);
 
-            if (Math.sqrt(Math.pow(this.monter[i].position.x, 2) + Math.pow(this.monter[i].position.z, 2)) > 100) {
-                this.monter[i].rotation.y += Math.PI * Math.random();
-                let x = this.monter[i].position.x;
-                let z = this.monter[i].position.z;
+            if (Math.sqrt(Math.pow(this.monters[i].position.x, 2) + Math.pow(this.monters[i].position.z, 2)) > 100) {
+                this.monters[i].rotation.y += Math.PI * Math.random();
+                let x = this.monters[i].position.x;
+                let z = this.monters[i].position.z;
                 do {
-                    this.monter[i].rotation.y += Math.PI * Math.random();
-                    x = this.monter[i].position.x + 0.1 * Math.sin(this.monter[i].rotation.y);
-                    z = this.monter[i].position.z + 0.1 * Math.cos(this.monter[i].rotation.y);
+                    this.monters[i].rotation.y += Math.PI * Math.random();
+                    x = this.monters[i].position.x + 0.1 * Math.sin(this.monters[i].rotation.y);
+                    z = this.monters[i].position.z + 0.1 * Math.cos(this.monters[i].rotation.y);
                 } while (Math.sqrt(Math.pow(x, 2) + Math.pow(z, 2)) > 100);
             }
         }
@@ -267,6 +291,13 @@ class Game {
 
         this.gun.position.set(this.car.position.x, this.car.position.y + 3.5, this.car.position.z);
         this.gun.rotation.y = this.car.rotation.y - this.angleGun;
+
+
+        for (let i = 0; i < this.bulletManager.bullets.length; i++) {
+            for (let j = 0; j < this.monters.length; j++) {
+
+            }
+        }
     }
 
     initSphere() {
@@ -313,8 +344,7 @@ class Game {
     checkClick(raycaster, object) {
         const intersects = raycaster.intersectObject(object);
         if (intersects.length > 0) {
-            console.log('Clicked on the cube!');
-            return true;
+            return intersects[0].point;
         }
         return false;
     }
