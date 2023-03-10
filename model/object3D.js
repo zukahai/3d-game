@@ -17,6 +17,12 @@ class Object3D {
         this.loader.load(url,
             (gltf) => {
                 this.object = gltf.scene;
+                // this.object.material = new THREE.MeshBasicMaterial({
+                //     color: 0xffffff,
+                //     side: THREE.DoubleSide
+                // })
+
+
                 const animations = gltf.animations;
                 const mixer = new THREE.AnimationMixer(gltf.scene);
 

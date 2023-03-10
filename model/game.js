@@ -207,8 +207,21 @@ class Game {
             for (let i = 0; i < this.monters.length; i++) {
                 this.scene.add(this.monters[i]);
                 this.monters[i].position.set((Math.random() - Math.random()) * 50, Math.random() * 3.5 + 0.25, (Math.random() - Math.random()) * 30);
-                this.monters[i].scale.set(0.05, 0.05, 0.05);
+                this.monters[i].scale.set(0.2, 0.2, 0.2);
                 this.monters[i].rotation.y = Math.random() * Math.PI;
+                this.monters[i].dataUser = {
+                    scaleNormal: 0.2,
+                }
+
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0xffffff,
+                    emissive: 0xaaaaaa,
+                    emissiveIntensity: 1,
+                    roughness: 0.5,
+                    metalness: 0.5
+                });
+
+                this.monters[i].material = material;
             }
 
             this.loaded = true;
@@ -294,8 +307,9 @@ class Game {
 
 
         let idMonter = -1;
-        for (let i = 0; i < this.bulletManager.bullets.length; i++) {
-            for (let j = 0; j < this.monters.length; j++) {
+        for (let j = 0; j < this.monters.length; j++) {
+            let isShoot = false;
+            for (let i = 0; i < this.bulletManager.bullets.length; i++) {
                 if (this.checkCollide(this.bulletManager.bullets[i], this.monters[j])) {
                     this.bulletManager.bullets[i].visible = false;
                     let scale = this.monters[j].scale.x;
@@ -304,7 +318,11 @@ class Game {
                     if (newScale < 0.02) {
                         idMonter = j;
                     }
+                    isShoot = true;
                 }
+            }
+            if (isShoot) {
+
             }
         }
         if (idMonter != -1) {
